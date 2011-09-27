@@ -1,12 +1,12 @@
 当前版本: phZoom beta 1.20
 
 使用方法:
-1. 加载jQuery库, 在此不赘述其过程了.
-2. 加载压缩包内的phZoom.css, 请保证压缩包内的两张小图片与phzoom.css同级目录.
-3. 加载phzoom.js, 请保证其加载于jQuery库之后.
+1. 加载jQuery库(1.4+)
+2. 加载phZoom.css, 请保证压缩包内的两张小图片与phzoom.css同级目录
+3. 加载phzoom.js, 请保证其加载于jQuery库之后
 4. 调用接口:
 $node.phzoom({
-// 此处为设置项, 可留空.
+// 此处为设置项, 可留空
 });
 请把$node改为所需的jQuery选择器, 如: $('a:has(img)')
 
