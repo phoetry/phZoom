@@ -1,8 +1,8 @@
 /**
  * @name jQuery phZoom Plugin
- * @version Beta 1.20
+ * @version Beta 1.21
  * @create 2011-7-10
- * @lastmodified 2011-9-26
+ * @lastmodified 2011-10-15
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
@@ -12,7 +12,8 @@
  * @param $lay:遮罩层, $zoom:大图容器, phZoom:构造主函数
  * @param e:当前对象, x:插件设置项, y:当前index, z:对象集合
  **/
-var $w=$(window),$b=$('body'),
+var $w=$(window),
+	$d=$(document),$b=$('body'),
 	$lay=$('<div id="ph_lay"/>'),
 	$zoom=$('<div id="ph_zoom"/>'),
 	$both=$lay.add($zoom),
@@ -111,7 +112,7 @@ phZoom.prototype={
 		B.onload=function(){
 			that.hov.is('.loading')?(
 				// resize之类的事件会影响文档尺寸, 故height一下
-				$zoom.height(Math.max($b.height(),$w.height()))
+				$zoom.height($d.height())
 					.show().append(B),
 				that.neighbor(),
 				that.imgAnim()
@@ -133,7 +134,7 @@ phZoom.prototype={
 					pos[8],pos[8]-pos[2],!tooBig,
 					$('span',that.nav).hide(),$B
 				);
-			})();
+			}());
 		$B.after(this.cap.hide()).css({//定位1
 			left:pos[4],top:pos[5],
 			width:pos[0],height:pos[1]
@@ -159,7 +160,7 @@ phZoom.prototype={
 	},
 	// 退出大图, bool为true时则化身为imgChange的过程(保持遮罩层)
 	imgQuit:function(bool){
-		this.hov.hide().is('.loading')?this.hov.removeClass('loading'):$b.unbind('.ph');
+		this.hov.hide().is('.loading')?this.hov.removeClass('loading'):$d.unbind('.ph');
 		$zoom.hide().empty();
 		bool||$lay.fadeOut();
 		return false;
@@ -179,11 +180,11 @@ phZoom.prototype={
 	// 绑定快捷键, 逃脱键:退出, 左箭头:上一张, 右箭头:下一张
 	keyBind:function(){
 		var k,that=this;
-		$b.bind('keydown.ph',function(e){
+		$d.bind('keydown.ph',function(e){
 			k=e.which;
-			return k===27?that.imgQuit()
-				:k===39&&that.end?that.imgChange(1)
-				:k===37&&that.idx?that.imgChange(-1)
+			return 27===k?that.imgQuit()
+				:39===k&&that.end?that.imgChange(1)
+				:37===k&&that.idx?that.imgChange(-1)
 				:true;
 		});
 	},
@@ -193,7 +194,7 @@ phZoom.prototype={
 		return{
 			click:function(e){
 				e=e.pageX>a/2;
-				return that.len===1||(
+				return 1===that.len||(
 					that.idx?that.end
 					?that.imgChange(e||-1)
 					:e||that.imgChange(-1)
@@ -209,7 +210,7 @@ phZoom.prototype={
 					nav.eq(1-i).hide()
 				):nav[i?'show':'hide']();
 				bool||e===$B[0].offsetLeft||
-				$B.is(':animated')||$B.animate({left:e},200);
+				$B.not(':animated').animate({left:e},200);
 			}
 		}
 	}
@@ -231,7 +232,7 @@ $.phzoom=function(z,x){
 		limitWidth:false
 	},x);
 	return z.each(function(y){
-		return $('img',this)[0]&&new phZoom($(this),x,y,z);
+		$('img',this)[0]&&new phZoom($(this),x,y,z);
 	});
 };
 // 插件调用接口, hook me, 完毕.

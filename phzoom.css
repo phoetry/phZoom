@@ -9,7 +9,7 @@ z-index:9999;
 height:100%;
 position:fixed;
 _position:absolute;
-_height:expression(body.offsetHeight);
+_height:expression(Math.max(documentElement.clientHeight,body.scrollHeight));
 }
 #ph_zoom{
 position:absolute;
