@@ -12,7 +12,7 @@
  * @param $lay:遮罩层, $zoom:大图容器, phZoom:构造主函数
  * @param e:当前对象, x:插件设置项, y:当前index, z:对象集合
  **/
-var $w=$(window),wh,
+var $w=$(window),
 	$d=$(document),$b=$('body'),
 	$lay=$('<div id="ph_lay"/>'),
 	$zoom=$('<div id="ph_zoom"/>'),
@@ -54,7 +54,7 @@ phZoom=function(e,x,y,z){
 	}));
 	// 点击页面上随便哪里都能退出(后面会排除大图区域)
 	$both.click(function(){that.imgQuit()});
-	// 尝试Fix IE6下hover可能错位的BUG
+	// 尝试Fix IE6下hover可能错位的BUG(未完美)
 	window.XMLHttpRequest||e.height(this.img.height());
 };
 /** 
