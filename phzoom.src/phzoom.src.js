@@ -1,8 +1,8 @@
 /**
  * @name jQuery phZoom Plugin
- * @version Beta 1.21
+ * @version Beta 1.22
  * @create 2011-7-10
- * @lastmodified 2011-10-15
+ * @lastmodified 2011-10-17
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
@@ -12,7 +12,7 @@
  * @param $lay:遮罩层, $zoom:大图容器, phZoom:构造主函数
  * @param e:当前对象, x:插件设置项, y:当前index, z:对象集合
  **/
-var $w=$(window),
+var $w=$(window),wh,
 	$d=$(document),$b=$('body'),
 	$lay=$('<div id="ph_lay"/>'),
 	$zoom=$('<div id="ph_zoom"/>'),
@@ -45,7 +45,7 @@ phZoom=function(e,x,y,z){
 			})[0]
 		])
 	}).add(
-	// nav: 上/下一张
+	// nav:上/下一张
 	this.nav=$('<div/>',{
 		id:'ph_nav',
 		css:{color:x.navColor},
@@ -65,7 +65,7 @@ phZoom.prototype={
 	// 当前对象绑定的事件
 	imgFn:function(){
 		var that=this,
-			// 显示/隐藏hover
+			// 显示或隐藏hover
 			hov=function(bool){
 				that.hov.not('.loading').stop(0,1)
 					[bool?'fadeIn':'fadeOut']();
@@ -79,80 +79,79 @@ phZoom.prototype={
 			}
 		}
 	},
-	// 为后面动画准备一些必需品, A:小图(jQuery), B:大图(DOM)
-	imgPos:function(){
-		var A=this.img,B=this.imgB;
+	// 为之后动画准备一些必需品, A:小图(jQuery)
+	imgPos:function(oriW,oriH){
+		var A=this.img,
 			pos=[
-				A.width(),A.height(),
-				B.width||+$(B).attr('width'),
-				B.height||+$(B).attr('height'),
+				oriW,oriH,A.width(),A.height(),
 				A.offset().left,A.offset().top,
 				$w.scrollLeft(),$w.scrollTop(),
 				$b.width(),$w.height()
 			];
 		// 限宽模式下自动调整特大图
-		this.opt.limitWidth&&pos[2]>pos[8]&&(
-			pos[3]=pos[8]*pos[3]/pos[2],
-			pos[2]=pos[8]
+		this.opt.limitWidth&&pos[0]>pos[8]&&(
+			pos[1]=pos[8]*pos[1]/pos[0],
+			pos[0]=pos[8]
 		);
 		pos.push(
-			(pos[8]-pos[0])/2+pos[6],
-			(pos[9]-pos[1])/2+pos[7],
 			(pos[8]-pos[2])/2+pos[6],
-			(pos[9]-pos[3])/2+pos[7]
+			(pos[9]-pos[3])/2+pos[7],
+			(pos[8]-pos[0])/2+pos[6],
+			(pos[9]-pos[1])/2+pos[7]
 		);
 		return pos;
 	},
-	// 开始加载大图, 加个新方法:imgB
+	// 开始加载大图
 	imgLoad:function(){
-		var that=this,
-			B=this.imgB=new Image();
+		var that=this,B=new Image();
 		this.hov.addClass('loading');
 		$lay.fadeTo(this.opt.layDur,this.opt.layOpacity);
 		B.onload=function(){
-			that.hov.is('.loading')?(
-				// resize之类的事件会影响文档尺寸, 故height一下
-				$zoom.height($d.height())
-					.show().append(B),
-				that.neighbor(),
-				that.imgAnim()
-			):that.imgQuit();
+			B.onload=null;
+			B.className='zoomed';
+			// resize之类的事件会影响文档尺寸, 故height一下
+			$zoom.height($d.height())
+				.show().append(B);
+			that.imgAnim(B);
+			that.preLoad();
 		};
-		B.className='zoomed';
 		B.src=this.lnk.href;
 	},
 	// 大图执行两次动画, 动画完毕后绑定事件
-	imgAnim:function(){
-		var that=this,
-			$B=$(this.imgB),
-			pos=this.imgPos(),
-			// 当前大图溢出文档宽度时:true
-			tooBig=pos[8]<pos[2],
-			// 预先准备好动画后需要绑定的事件
+	imgAnim:function(B){
+		var that=this,$B=$(B),
+			// 获取动画所需的尺寸与位置, 传参:大图的原始宽度和高度
+			pos=this.imgPos(
+				B.width||+$B.attr('width'),
+				B.height||+$B.attr('height')
+			),
+			// 当前大图溢出Body宽度时:true
+			tooBig=pos[0]>pos[8],
+			// 预备好动画后需要绑定的事件
 			eMon=(function(){
 				return that.eMon(
-					pos[8],pos[8]-pos[2],!tooBig,
+					pos[8],pos[8]-pos[0],!tooBig,
 					$('span',that.nav).hide(),$B
 				);
 			}());
 		$B.after(this.cap.hide()).css({//定位1
 			left:pos[4],top:pos[5],
-			width:pos[0],height:pos[1]
+			width:pos[2],height:pos[3]
 		}).animate({//定位2, 动画1
 			left:pos[10],top:pos[11]
 		},that.opt.animDurA,function(){
 			$B.animate({//定位3, 动画2
 				left:pos[12],top:pos[13],
-				width:pos[2],height:pos[3]
+				width:pos[0],height:pos[1]
 			},that.opt.animDurB,function(){//动画完
 				that.hov.removeClass('loading');
 				that.cap.css({//定位cap
-					top:pos[3]+pos[13],
+					top:pos[1]+pos[13],
 					left:tooBig?0:pos[12],
-					width:tooBig?pos[8]:pos[2]
+					width:tooBig?pos[8]:pos[0]
 				}).fadeTo(300,.8);
 				that.nav.css({//定位nav并绑定事件
-					top:pos[3]/3+pos[13]
+					top:pos[1]/3+pos[13]
 				}).bind(eMon);
 				that.keyBind();
 			}).bind(eMon);
@@ -165,14 +164,14 @@ phZoom.prototype={
 		bool||$lay.fadeOut();
 		return false;
 	},
-	// 切换上/下一张, 传递参数true给imgQuit
+	// 切换上/下一张, 传参true给imgQuit
 	imgChange:function(num){
 		this.imgQuit(1);
 		$('.ph_hover',$(this.all[this.idx+num]).click()).show();
 		return false;
 	},
 	// 预加载相邻图片
-	neighbor:function(){
+	preLoad:function(){
 		var x,y;
 		this.idx&&(x=new Image(),x.src=this.all[this.idx-1].href,delete x);
 		this.end&&(y=new Image(),y.src=this.all[this.idx+1].href,delete y);
