@@ -2,7 +2,7 @@
  * @name jQuery phZoom Plugin
  * @version Beta 1.22
  * @create 2011-7-10
- * @lastmodified 2011-10-17
+ * @lastmodified 2011-10-18
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
@@ -26,7 +26,7 @@ phZoom=function(e,x,y,z){
 	// 当前e为对象集合末项时:false
 	this.end=this.len>1+y;
 	// 获取当前e的小图(返回jQuery)
-	this.img=$('img',e).eq(0);
+	this.img=$('img:first',e);
 	// 初始化当前e并绑定事件(返回DOM)
 	this.lnk=e.addClass('phzoom').unbind('click').bind(this.imgFn())
 		.append(this.hov=$('<span class="ph_hover"/>').hide())[0];
