@@ -1,6 +1,5 @@
-[phZoom](http://phoetry.me/archives/phzoom.html) 是一个小巧的jQuery看图插件.
-================================
-
+[phZoom] 是一个小巧的jQuery看图插件.
+==================================
 当前版本: phZoom beta 1.22
 更新时间: 2011.10.18
 
@@ -12,7 +11,7 @@
 $node.phzoom({
 // 此处为设置项, 可留空
 });
-请把 `$node` 改为所需的jQuery选择器, 如: `$('a:has(img)')`
+请把 $node 改为所需的jQuery选择器, 如: $('a:has(img)')
 
 不管如何调用, 请务必将调用代码包在一个DOM Ready方法内, 如:
 $(function(){
@@ -72,4 +71,4 @@ GitHub页面:
 https://github.com/phoetry/phZoom
 
 感谢你的支持与反馈.
-作者: [Phoetry](http://phoetry.me)
+作者: Phoetry
