@@ -1,22 +1,21 @@
 /**
  * @name jQuery phZoom Plugin
- * @version Beta 1.22
+ * @version 1.23 Release.
  * @create 2011-7-10
- * @lastmodified 2011-10-18
+ * @lastmodified 2011-11-05
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
  **/
-~function($){
+~function($){var
 /** 
  * @param $lay:遮罩层, $zoom:大图容器, phZoom:构造主函数
  * @param e:当前对象, x:插件设置项, y:当前index, z:对象集合
  **/
-var $w=$(window),
-	$d=$(document),$b=$('body'),
-	$lay=$('<div id="ph_lay"/>'),
-	$zoom=$('<div id="ph_zoom"/>'),
-	$both=$lay.add($zoom),
+$w=$(window),$d=$(document),
+$lay=$('<div id="ph_lay"/>'),
+$zoom=$('<div id="ph_zoom"/>'),
+$both=$lay.add($zoom),
 phZoom=function(e,x,y,z){
 	var that=this;
 	this.opt=x;
@@ -65,14 +64,12 @@ phZoom.prototype={
 	// 当前对象绑定的事件
 	imgFn:function(){
 		var that=this,
-			// 显示或隐藏hover
-			hov=function(bool){
-				that.hov.not('.loading').stop(0,1)
-					[bool?'fadeIn':'fadeOut']();
+			s=function(){
+				return that.hov.not('.loading').stop(0,1);
 			};
 		return{
-			mouseover:function(){hov(1)},
-			mouseout:function(){hov()},
+			mouseover:function(){s().fadeIn()},
+			mouseout:function(){s().fadeOut()},
 			click:function(){
 				that.imgLoad();
 				return false;
@@ -86,7 +83,7 @@ phZoom.prototype={
 				oriW,oriH,A.width(),A.height(),
 				A.offset().left,A.offset().top,
 				$w.scrollLeft(),$w.scrollTop(),
-				$b.width(),$w.height()
+				$w.width(),$w.height()
 			];
 		// 限宽模式下自动调整特大图
 		this.opt.limitWidth&&pos[0]>pos[8]&&(
@@ -103,17 +100,20 @@ phZoom.prototype={
 	},
 	// 开始加载大图
 	imgLoad:function(){
+		$lay.fadeTo(this.opt.layDur,this.opt.layOpacity);
 		var that=this,B=new Image();
 		this.hov.addClass('loading');
-		$lay.fadeTo(this.opt.layDur,this.opt.layOpacity);
+		B.className='zoomed';
 		B.onload=function(){
 			B.onload=null;
-			B.className='zoomed';
+			// 如果此时已经退出大图, 则停止执行
+			that.hov.is('.loading')&&(
 			// resize之类的事件会影响文档尺寸, 故height一下
 			$zoom.height($d.height())
-				.show().append(B);
-			that.imgAnim(B);
-			that.preLoad();
+				.show().append(B),
+			that.imgAnim(B),
+			that.preLoad()
+			);
 		};
 		B.src=this.lnk.href;
 	},
@@ -126,11 +126,11 @@ phZoom.prototype={
 				B.height||+$B.attr('height')
 			),
 			// 当前大图溢出Body宽度时:true
-			tooBig=pos[0]>pos[8],
+			oFlow=pos[0]>pos[8],
 			// 预备好动画后需要绑定的事件
 			eMon=(function(){
 				return that.eMon(
-					pos[8],pos[8]-pos[0],!tooBig,
+					pos[8],pos[8]-pos[0],!oFlow,
 					$('span',that.nav).hide(),$B
 				);
 			}());
@@ -147,9 +147,9 @@ phZoom.prototype={
 				that.hov.removeClass('loading');
 				that.cap.css({//定位cap
 					top:pos[1]+pos[13],
-					left:tooBig?0:pos[12],
-					width:tooBig?pos[8]:pos[0]
-				}).fadeTo(300,.8);
+					left:oFlow?0:pos[12],
+					width:oFlow?pos[8]:pos[0]
+				}).fadeTo(300,.7);
 				that.nav.css({//定位nav并绑定事件
 					top:pos[1]/3+pos[13]
 				}).bind(eMon);
@@ -178,7 +178,7 @@ phZoom.prototype={
 	},
 	// 绑定快捷键, 逃脱键:退出, 左箭头:上一张, 右箭头:下一张
 	keyBind:function(){
-		var k,that=this;
+		var that=this,k;
 		$d.bind('keydown.ph',function(e){
 			k=e.which;
 			return 27===k?that.imgQuit()
@@ -220,7 +220,7 @@ phZoom.prototype={
  **/
 $.phzoom=function(z,x){
 	if(!z.length)return;
-	$b.append($both);
+	$('body').append($both);
 	x=$.extend({
 		layOpacity:.7,
 		layDur:300,
