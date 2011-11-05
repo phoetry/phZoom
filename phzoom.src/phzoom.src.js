@@ -1,6 +1,6 @@
 /**
  * @name jQuery phZoom Plugin
- * @version RC 1.23
+ * @version 1.23 RC
  * @create 2011-7-10
  * @lastmodified 2011-11-05
  * @description Based on jQuery 1.4+
