@@ -220,7 +220,6 @@ phZoom.prototype={
  **/
 $.phzoom=function(z,x){
 	if(!z.length)return;
-	$('body').append($both);
 	x=$.extend({
 		layOpacity:.7,
 		layDur:300,
@@ -230,6 +229,8 @@ $.phzoom=function(z,x){
 		capColor:'#cf0',
 		limitWidth:false
 	},x);
+	$('#ph_lay')[0]||
+	$('body').append($both);
 	return z.each(function(y){
 		$('img',this)[0]&&new phZoom($(this),x,y,z);
 	});
