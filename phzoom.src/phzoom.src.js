@@ -1,22 +1,22 @@
 /**
  * @name jQuery phZoom Plugin
- * @version 1.23 RC
+ * @version 1.25 Final
  * @create 2011-7-10
- * @lastmodified 2011-11-05
+ * @lastmodified 2011-12-06
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
  **/
 ~function($){var
 /** 
- * @param $lay:遮罩层, $zoom:大图容器, phZoom:构造主函数
- * @param e:当前对象, x:插件设置项, y:当前index, z:对象集合
+ * @param $lay:遮罩层, $zoom:大图容器, PHZOOM:构造主函数
+ * @param e:当前对象, x:插件设置, y:当前index, z:对象集合
  **/
 $w=$(window),$d=$(document),
 $lay=$('<div id="ph_lay"/>'),
 $zoom=$('<div id="ph_zoom"/>'),
 $both=$lay.add($zoom),
-phZoom=function(e,x,y,z){
+PHZOOM=function(e,x,y,z){
 	var that=this;
 	this.opt=x;
 	this.idx=y;
@@ -60,7 +60,8 @@ phZoom=function(e,x,y,z){
  * prototype of phZoom function
  * @param B:new Image(), $B:B的jQuery对象
  **/
-phZoom.prototype={
+PHZOOM.prototype={
+	constructor:PHZOOM,
 	// 当前对象绑定的事件
 	imgFn:function(){
 		var that=this,
@@ -101,7 +102,7 @@ phZoom.prototype={
 	// 开始加载大图
 	imgLoad:function(){
 		$lay.fadeTo(this.opt.layDur,this.opt.layOpacity);
-		var that=this,B=new Image();
+		var that=this,B=Image();
 		this.hov.addClass('loading');
 		B.className='zoomed';
 		B.onload=function(){
@@ -128,12 +129,12 @@ phZoom.prototype={
 			// 当前大图溢出Body宽度时:true
 			oFlow=pos[0]>pos[8],
 			// 预备好动画后需要绑定的事件
-			eMon=(function(){
-				return that.eMon(
+			eMon=function(){
+				return that.evtMon(
 					pos[8],pos[8]-pos[0],!oFlow,
 					$('span',that.nav).hide(),$B
 				);
-			}());
+			}();
 		$B.after(this.cap.hide()).css({//定位1
 			left:pos[4],top:pos[5],
 			width:pos[2],height:pos[3]
@@ -159,7 +160,7 @@ phZoom.prototype={
 	},
 	// 退出大图, bool为true时则化身为imgChange的过程(保持遮罩层)
 	imgQuit:function(bool){
-		this.hov.hide().is('.loading')?this.hov.removeClass('loading'):$d.unbind('.ph');
+		this.hov.hide().is('.loading')?this.hov.removeClass('loading'):$d.unbind('.phzoom');
 		$zoom.hide().empty();
 		bool||$lay.fadeOut();
 		return false;
@@ -171,24 +172,23 @@ phZoom.prototype={
 		return false;
 	},
 	// 预加载相邻图片
-	preLoad:function(){
-		var x,y;
-		this.idx&&(x=new Image(),x.src=this.all[this.idx-1].href,delete x);
-		this.end&&(y=new Image(),y.src=this.all[this.idx+1].href,delete y);
+	preLoad:function(x,y){
+		this.idx&&(x=Image(),x.src=this.all[this.idx-1].href,delete x);
+		this.end&&(y=Image(),y.src=this.all[this.idx+1].href,delete y);
 	},
 	// 绑定快捷键, 逃脱键:退出, 左箭头:上一张, 右箭头:下一张
 	keyBind:function(){
 		var that=this,k;
-		$d.bind('keydown.ph',function(e){
+		$d.bind('keydown.phzoom',function(e){
 			k=e.which;
-			return 27===k?that.imgQuit()
-				:39===k&&that.end?that.imgChange(1)
-				:37===k&&that.idx?that.imgChange(-1)
+			return 27==k?that.imgQuit()
+				:39==k&&that.end?that.imgChange(1)
+				:37==k&&that.idx?that.imgChange(-1)
 				:true;
 		});
 	},
 	// 大图加载完毕后需要绑定的事件
-	eMon:function(a,b,bool,nav,$B){
+	evtMon:function(a,b,bool,nav,$B){
 		var that=this,i;
 		return{
 			click:function(e){
@@ -208,7 +208,7 @@ phZoom.prototype={
 					nav.eq(i).show(),
 					nav.eq(1-i).hide()
 				):nav[i?'show':'hide']();
-				bool||e===$B[0].offsetLeft||
+				bool||e==$B.position().left||
 				$B.not(':animated').animate({left:e},200);
 			}
 		}
@@ -231,12 +231,16 @@ $.phzoom=function(z,x){
 	},x);
 	$('#ph_lay')[0]||
 	$('body').append($both);
-	return z.each(function(y){
-		$('img',this)[0]&&new phZoom($(this),x,y,z);
+	return z.each(function(y,t){
+		t=$(this).has('img');
+		t.data('phzoom',new PHZOOM(t,x,y,z));
 	});
 };
 // 插件调用接口, hook me, 完毕.
 $.fn.phzoom=function(x){
 	return $.phzoom(this,x);
 };
+function log(z){
+	console.log({}.toString.call(z)+' | '+z);
+}
 }(jQuery);
