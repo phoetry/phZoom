@@ -1,8 +1,8 @@
 /**
  * @name jQuery phZoom Plugin
- * @version 1.25 Final
+ * @version 1.26 Final
  * @create 2011-7-10
- * @lastmodified 2011-12-06
+ * @lastmodified 2011-12-11
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
@@ -23,7 +23,7 @@ PHZOOM=function(e,x,y,z){
 	this.all=z;
 	this.len=z.length;
 	// 当前e为对象集合末项时:false
-	this.end=this.len>1+y;
+	this.end=this.len>y+1;
 	// 获取当前e的小图(返回jQuery)
 	this.img=$('img:first',e);
 	// 初始化当前e并绑定事件(返回DOM)
@@ -40,7 +40,7 @@ PHZOOM=function(e,x,y,z){
 			})[0],
 			$('<span/>',{//索引
 				id:'ph_idx',
-				text:1+y+' / '+this.len
+				text:y+1+' / '+this.len
 			})[0]
 		])
 	}).add(
@@ -102,7 +102,7 @@ PHZOOM.prototype={
 	// 开始加载大图
 	imgLoad:function(){
 		$lay.fadeTo(this.opt.layDur,this.opt.layOpacity);
-		var that=this,B=Image();
+		var that=this,B=new Image;
 		this.hov.addClass('loading');
 		B.className='zoomed';
 		B.onload=function(){
@@ -173,8 +173,8 @@ PHZOOM.prototype={
 	},
 	// 预加载相邻图片
 	preLoad:function(x,y){
-		this.idx&&(x=Image(),x.src=this.all[this.idx-1].href,delete x);
-		this.end&&(y=Image(),y.src=this.all[this.idx+1].href,delete y);
+		this.idx&&(x=new Image,x.src=this.all[this.idx-1].href,delete x);
+		this.end&&(y=new Image,y.src=this.all[this.idx+1].href,delete y);
 	},
 	// 绑定快捷键, 逃脱键:退出, 左箭头:上一张, 右箭头:下一张
 	keyBind:function(){
