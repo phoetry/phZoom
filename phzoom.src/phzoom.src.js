@@ -1,8 +1,8 @@
 /**
  * @name jQuery phZoom Plugin
- * @version 1.26 Final
+ * @version 1.25 Final
  * @create 2011-7-10
- * @lastmodified 2011-12-11
+ * @lastmodified 2011-12-06
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
@@ -61,7 +61,6 @@ PHZOOM=function(e,x,y,z){
  * @param B:new Image(), $B:B的jQuery对象
  **/
 PHZOOM.prototype={
-	constructor:PHZOOM,
 	// 当前对象绑定的事件
 	imgFn:function(){
 		var that=this,
@@ -232,8 +231,7 @@ $.phzoom=function(z,x){
 	$('#ph_lay')[0]||
 	$('body').append($both);
 	return z.each(function(y,t){
-		t=$(this).has('img');
-		t.data('phzoom',new PHZOOM(t,x,y,z));
+		(t=$(t).has('img'))[0]&&t.data('phzoom',new PHZOOM(t,x,y,z));
 	});
 };
 // 插件调用接口, hook me, 完毕.
