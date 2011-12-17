@@ -1,8 +1,8 @@
 /**
  * @name jQuery phZoom Plugin
- * @version 1.25 Final
+ * @version 1.27 Final
  * @create 2011-7-10
- * @lastmodified 2011-12-06
+ * @lastmodified 2011-12-17
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
