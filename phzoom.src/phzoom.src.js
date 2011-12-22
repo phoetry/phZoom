@@ -1,8 +1,8 @@
 /**
  * @name jQuery phZoom Plugin
- * @version 1.27 Final
+ * @version 1.28 Final
  * @create 2011-7-10
- * @lastmodified 2011-12-17
+ * @lastmodified 2011-12-22
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
@@ -13,11 +13,10 @@
  * @param e:当前对象, x:插件设置, y:当前index, z:对象集合
  **/
 $w=$(window),$d=$(document),
-$lay=$('<div id="ph_lay"/>'),
-$zoom=$('<div id="ph_zoom"/>'),
+$lay=$('<div id=ph_lay/>'),
+$zoom=$('<div id=ph_zoom/>'),
 $both=$lay.add($zoom),
 PHZOOM=function(e,x,y,z){
-	var that=this;
 	this.opt=x;
 	this.idx=y;
 	this.all=z;
@@ -28,7 +27,7 @@ PHZOOM=function(e,x,y,z){
 	this.img=$('img:first',e);
 	// 初始化当前e并绑定事件(返回DOM)
 	this.lnk=e.addClass('phzoom').unbind('click').bind(this.imgFn())
-		.append(this.hov=$('<span class="ph_hover"/>').hide())[0];
+		.append(this.hov=$('<span class=ph_hover/>').hide())[0];
 	// cap:大图底部的标题+索引+上/下一张(合体)
 	this.cap=$('<div/>',{
 		css:{color:x.capColor},
@@ -48,12 +47,12 @@ PHZOOM=function(e,x,y,z){
 	this.nav=$('<div/>',{
 		id:'ph_nav',
 		css:{color:x.navColor},
-		html:(y?'<span id="ph_prev">Prev</span>':'')
-			+(this.end?'<span id="ph_next">Next</span>':'')
+		html:(y?'<span id=ph_prev>'+x.prevText+'</span>':'')
+			+(this.end?'<span id=ph_next>'+x.nextText+'</span>':'')
 	}));
 	// 点击页面上随便哪里都能退出(后面会排除大图区域)
-	$both.click(function(){that.imgQuit()});
-	// 尝试Fix IE6下hover可能错位的BUG(未完美)
+	$both.click($.proxy(this,'imgQuit'));
+	// 尝试Fix IE6下hover可能错位的BUG
 	window.XMLHttpRequest||e.height(this.img.height());
 };
 /** 
@@ -109,10 +108,8 @@ PHZOOM.prototype={
 			// 如果此时已经退出大图, 则停止执行
 			that.hov.is('.loading')&&(
 			// resize之类的事件会影响文档尺寸, 故height一下
-			$zoom.height($d.height())
-				.show().append(B),
-			that.imgAnim(B),
-			that.preLoad()
+			$zoom.height($d.height()).append(B).show(),
+			that.imgAnim(B),that.preLoad()
 			);
 		};
 		B.src=this.lnk.href;
@@ -129,10 +126,7 @@ PHZOOM.prototype={
 			oFlow=pos[0]>pos[8],
 			// 预备好动画后需要绑定的事件
 			eMon=function(){
-				return that.evtMon(
-					pos[8],pos[8]-pos[0],!oFlow,
-					$('span',that.nav).hide(),$B
-				);
+				return that.evtMon(pos[8],pos[8]-pos[0],!oFlow,$B)
 			}();
 		$B.after(this.cap.hide()).css({//定位1
 			left:pos[4],top:pos[5],
@@ -157,16 +151,16 @@ PHZOOM.prototype={
 			}).bind(eMon);
 		});
 	},
-	// 退出大图, bool为true时则化身为imgChange的过程(保持遮罩层)
+	// 退出大图, bool为false时则化身为imgChange的过程(保持遮罩层)
 	imgQuit:function(bool){
 		this.hov.hide().is('.loading')?this.hov.removeClass('loading'):$d.unbind('.phzoom');
 		$zoom.hide().empty();
-		bool||$lay.fadeOut();
+		bool&&$lay.fadeOut();
 		return false;
 	},
-	// 切换上/下一张, 传参true给imgQuit
+	// 切换上/下一张, 不传参给imgQuit
 	imgChange:function(num){
-		this.imgQuit(1);
+		this.imgQuit();
 		$('.ph_hover',$(this.all[this.idx+num]).click()).show();
 		return false;
 	},
@@ -180,15 +174,15 @@ PHZOOM.prototype={
 		var that=this,k;
 		$d.bind('keydown.phzoom',function(e){
 			k=e.which;
-			return 27==k?that.imgQuit()
+			return 27==k?that.imgQuit(1)
 				:39==k&&that.end?that.imgChange(1)
 				:37==k&&that.idx?that.imgChange(-1)
 				:true;
 		});
 	},
 	// 大图加载完毕后需要绑定的事件
-	evtMon:function(a,b,bool,nav,$B){
-		var that=this,i;
+	evtMon:function(a,b,c,$B){
+		var that=this,nav=$('span',this.nav).hide();
 		return{
 			click:function(e){
 				e=e.pageX>a/2;
@@ -200,14 +194,14 @@ PHZOOM.prototype={
 				);
 			},
 			mouseout:function(){nav.hide()},
-			mousemove:function(e){
-				e=e.pageX;i=e>a/2;
+			mousemove:function(e,i){
+				i=(e=e.pageX)>a/2,
 				e=e<a/3?0:e>2*a/3?b:b/2;
 				that.idx?(
 					nav.eq(i).show(),
 					nav.eq(1-i).hide()
 				):nav[i?'show':'hide']();
-				bool||e==$B.position().left||
+				c||e==$B.position().left||
 				$B.not(':animated').animate({left:e},200);
 			}
 		}
@@ -215,24 +209,29 @@ PHZOOM.prototype={
 };
 /** 
  * 直接扩展jQuery底层方法
- * @param x:插件设置项, y:当前index, z:对象集合
+ * @param x:插件设置项, y:当前index, Z:初始传入的对象集合, z:过滤后的对象集合
  **/
-$.phzoom=function(z,x){
-	if(!z.length)return;
-	x=$.extend({
-		layOpacity:.7,
-		layDur:300,
-		animDurA:300,
-		animDurB:300,
-		navColor:'#cf0',
-		capColor:'#cf0',
-		limitWidth:false
-	},x);
-	$('#ph_lay')[0]||
-	$('body').append($both);
-	return z.each(function(y,t){
-		(t=$(t).has('img'))[0]&&t.data('phzoom',new PHZOOM(t,x,y,z));
-	});
+$.phzoom=function(Z,x,z){
+	(z=Z.has('img'))[0]&&(
+		$('#ph_lay')[0]||
+		$('body').append($both),
+		x=$.extend({
+			layOpacity:.7,
+			layDur:300,
+			animDurA:300,
+			animDurB:300,
+			navColor:'#cf0',
+			capColor:'#cf0',
+			prevText:'Prev',
+			nextText:'Next',
+			limitWidth:false,
+			returnOrigin:true
+		},x),
+		z.each(function(y,t){
+			$.data(t,'phzoom',new PHZOOM($(t),x,y,z));
+		})
+	);
+	return!x.returnOrigin&&z||Z;
 };
 // 插件调用接口, hook me, 完毕.
 $.fn.phzoom=function(x){

@@ -1,5 +1,6 @@
+/*phZoom*/
 #ph_lay,#ph_zoom{top:0;left:0;width:100%;z-index:9999;display:none}
-#ph_lay{height:100%;position:fixed;_height:expression(Math.max(documentElement.clientHeight,body.scrollHeight)+'px');_position:absolute}
+#ph_lay{position:fixed;height:100%;_height:expression(Math.max(documentElement.clientHeight,body.scrollHeight)+'px');_position:absolute}
 #ph_zoom{overflow-x:hidden;position:absolute}
 #ph_zoom span{margin:0;padding:0 9px;float:right;color:inherit}
 #ph_lay,#ph_cap,#ph_nav span{background:#000}
