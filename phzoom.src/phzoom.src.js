@@ -1,8 +1,8 @@
 /**
  * @name jQuery phZoom Plugin
- * @version 1.28 Final
+ * @version 1.29 Final
  * @create 2011-7-10
- * @lastmodified 2011-12-22
+ * @lastmodified 2012-1-2
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
@@ -13,8 +13,8 @@
  * @param e:当前对象, x:插件设置, y:当前index, z:对象集合
  **/
 $w=$(window),$d=$(document),
-$lay=$('<div id=ph_lay/>'),
-$zoom=$('<div id=ph_zoom/>'),
+$lay=$('<div id=ph_lay>'),
+$zoom=$('<div id=ph_zoom>'),
 $both=$lay.add($zoom),
 PHZOOM=function(e,x,y,z){
 	this.opt=x;
@@ -27,24 +27,24 @@ PHZOOM=function(e,x,y,z){
 	this.img=$('img:first',e);
 	// 初始化当前e并绑定事件(返回DOM)
 	this.lnk=e.addClass('phzoom').unbind('click').bind(this.imgFn())
-		.append(this.hov=$('<span class=ph_hover/>').hide())[0];
+		.append(this.hov=$('<span class=ph_hover>').hide())[0];
 	// cap:大图底部的标题+索引+上/下一张(合体)
-	this.cap=$('<div/>',{
+	this.cap=$('<div>',{
 		css:{color:x.capColor},
 		id:'ph_cap',
 		html:$([
-			$('<span/>',{//标题
+			$('<span>',{//标题
 				id:'ph_txt',
 				text:this.img[0].title||this.lnk.title||'No title'
 			})[0],
-			$('<span/>',{//索引
+			$('<span>',{//索引
 				id:'ph_idx',
 				text:y+1+' / '+this.len
 			})[0]
 		])
 	}).add(
 	// nav:上/下一张
-	this.nav=$('<div/>',{
+	this.nav=$('<div>',{
 		id:'ph_nav',
 		css:{color:x.navColor},
 		html:(y?'<span id=ph_prev>'+x.prevText+'</span>':'')
@@ -56,8 +56,8 @@ PHZOOM=function(e,x,y,z){
 	window.XMLHttpRequest||e.height(this.img.height());
 };
 /** 
- * prototype of phZoom function
- * @param B:new Image(), $B:B的jQuery对象
+ * prototype of PHZOOM function
+ * @param B:new Image, $B:B的jQuery对象
  **/
 PHZOOM.prototype={
 	// 当前对象绑定的事件
@@ -77,25 +77,23 @@ PHZOOM.prototype={
 	},
 	// 为之后动画准备一些必需品, A:小图(jQuery)
 	imgPos:function(oriW,oriH){
-		var A=this.img,
+		var A=this.img,L=$w.scrollLeft(),T=$w.scrollTop(),
 			pos=[
 				oriW,oriH,A.width(),A.height(),
 				A.offset().left,A.offset().top,
-				$w.scrollLeft(),$w.scrollTop(),
 				$w.width(),$w.height()
 			];
 		// 限宽模式下自动调整特大图
-		this.opt.limitWidth&&pos[0]>pos[8]&&(
-			pos[1]=pos[8]*pos[1]/pos[0],
-			pos[0]=pos[8]
+		this.opt.limitWidth&&pos[0]>pos[6]&&(
+			pos[1]=pos[6]*pos[1]/pos[0],
+			pos[0]=pos[6]
 		);
-		pos.push(
-			(pos[8]-pos[2])/2+pos[6],
-			(pos[9]-pos[3])/2+pos[7],
-			(pos[8]-pos[0])/2+pos[6],
-			(pos[9]-pos[1])/2+pos[7]
+		return pos.concat(
+			(pos[6]-pos[0])/2+L,
+			(pos[7]-pos[1])/2+T,
+			(pos[6]-pos[2])/2+L,
+			(pos[7]-pos[3])/2+T
 		);
-		return pos;
 	},
 	// 开始加载大图
 	imgLoad:function(){
@@ -106,10 +104,10 @@ PHZOOM.prototype={
 		B.onload=function(){
 			B.onload=null;
 			// 如果此时已经退出大图, 则停止执行
-			that.hov.is('.loading')&&(
-			// resize之类的事件会影响文档尺寸, 故height一下
-			$zoom.height($d.height()).append(B).show(),
-			that.imgAnim(B),that.preLoad()
+			that.hov.hasClass('loading')&&(
+				// resize之类的事件会影响文档尺寸, 故height一下
+				$zoom.height($d.height()).append(B).show(),
+				that.imgAnim(B),that.preLoad()
 			);
 		};
 		B.src=this.lnk.href;
@@ -123,39 +121,37 @@ PHZOOM.prototype={
 				B.height||+$B.attr('height')
 			),
 			// 当前大图溢出Body宽度时:true
-			oFlow=pos[0]>pos[8],
+			oFlow=pos[6]<pos[0],
 			// 预备好动画后需要绑定的事件
-			eMon=function(){
-				return that.evtMon(pos[8],pos[8]-pos[0],!oFlow,$B)
-			}();
+			E=this.evtMon(pos[6],pos[6]-pos[0],!oFlow,$B);
 		$B.after(this.cap.hide()).css({//定位1
 			left:pos[4],top:pos[5],
 			width:pos[2],height:pos[3]
 		}).animate({//定位2, 动画1
 			left:pos[10],top:pos[11]
-		},that.opt.animDurA,function(){
+		},this.opt.animDurA,function(){
 			$B.animate({//定位3, 动画2
-				left:pos[12],top:pos[13],
+				left:pos[8],top:pos[9],
 				width:pos[0],height:pos[1]
 			},that.opt.animDurB,function(){//动画完
 				that.hov.removeClass('loading');
 				that.cap.css({//定位cap
-					top:pos[1]+pos[13],
-					left:oFlow?0:pos[12],
-					width:oFlow?pos[8]:pos[0]
+					top:pos[1]+pos[9],
+					left:oFlow?0:pos[8],
+					width:oFlow?pos[6]:pos[0]
 				}).fadeTo(300,.7);
-				that.nav.css({//定位nav并绑定事件
-					top:pos[1]/3+pos[13]
-				}).bind(eMon);
+				//定位nav并绑定鼠标事件
+				that.nav.bind(E).css('top',pos[1]/3+pos[9]);
+				//绑定快捷键
 				that.keyBind();
-			}).bind(eMon);
+			}).bind(E);
 		});
 	},
-	// 退出大图, bool为false时则化身为imgChange的过程(保持遮罩层)
-	imgQuit:function(bool){
-		this.hov.hide().is('.loading')?this.hov.removeClass('loading'):$d.unbind('.phzoom');
+	// 退出大图, isQuit为undefined时化身为imgChange的过程(将保持遮罩层)
+	imgQuit:function(isQuit){
+		this.hov.hide().hasClass('loading')?this.hov.removeClass('loading'):$d.unbind('.phzoom');
 		$zoom.hide().empty();
-		bool&&$lay.fadeOut();
+		isQuit&&$lay.fadeOut();
 		return false;
 	},
 	// 切换上/下一张, 不传参给imgQuit
@@ -171,13 +167,12 @@ PHZOOM.prototype={
 	},
 	// 绑定快捷键, 逃脱键:退出, 左箭头:上一张, 右箭头:下一张
 	keyBind:function(){
-		var that=this,k;
+		var that=this;
 		$d.bind('keydown.phzoom',function(e){
-			k=e.which;
-			return 27==k?that.imgQuit(1)
-				:39==k&&that.end?that.imgChange(1)
-				:37==k&&that.idx?that.imgChange(-1)
-				:true;
+			e=e.which;
+			return e==27?that.imgQuit(1):
+				e==39&&that.end?that.imgChange(1):
+				e^37||!that.idx||that.imgChange(-1)
 		});
 	},
 	// 大图加载完毕后需要绑定的事件
@@ -186,7 +181,7 @@ PHZOOM.prototype={
 		return{
 			click:function(e){
 				e=e.pageX>a/2;
-				return 1===that.len||(
+				return that.len<2||(
 					that.idx?that.end
 					?that.imgChange(e||-1)
 					:e||that.imgChange(-1)
@@ -195,13 +190,12 @@ PHZOOM.prototype={
 			},
 			mouseout:function(){nav.hide()},
 			mousemove:function(e,i){
-				i=(e=e.pageX)>a/2,
-				e=e<a/3?0:e>2*a/3?b:b/2;
+				e=e.pageX,i=e>a/2;
 				that.idx?(
 					nav.eq(i).show(),
 					nav.eq(1-i).hide()
 				):nav[i?'show':'hide']();
-				c||e==$B.position().left||
+				c||(e=e<a/3?0:e>a*2/3?b:b/2)==$B.position().left||
 				$B.not(':animated').animate({left:e},200);
 			}
 		}
