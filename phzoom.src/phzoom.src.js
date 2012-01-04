@@ -225,7 +225,7 @@ $.phzoom=function(Z,x,z){
 			$.data(t,'phzoom',new PHZOOM($(t),x,y,z));
 		})
 	);
-	return!x.returnOrigin&&z||Z;
+	return x.returnOrigin?Z:z;
 };
 // 插件调用接口, hook me, 完毕.
 $.fn.phzoom=function(x){
