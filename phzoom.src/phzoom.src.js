@@ -1,8 +1,8 @@
 /**
  * @name jQuery phZoom Plugin
- * @version 1.29 Final
+ * @version 1.291 Final
  * @create 2011-7-10
- * @lastmodified 2012-1-2
+ * @lastmodified 2012-1-5
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
@@ -13,8 +13,8 @@
  * @param e:当前对象, x:插件设置, y:当前index, z:对象集合
  **/
 $w=$(window),$d=$(document),
-$lay=$('<div id=ph_lay>'),
-$zoom=$('<div id=ph_zoom>'),
+$lay=$('<div id=ph_lay/>'),
+$zoom=$('<div id=ph_zoom/>'),
 $both=$lay.add($zoom),
 PHZOOM=function(e,x,y,z){
 	this.opt=x;
@@ -27,7 +27,7 @@ PHZOOM=function(e,x,y,z){
 	this.img=$('img:first',e);
 	// 初始化当前e并绑定事件(返回DOM)
 	this.lnk=e.addClass('phzoom').unbind('click').bind(this.imgFn())
-		.append(this.hov=$('<span class=ph_hover>').hide())[0];
+		.append(this.hov=$('<span class=ph_hover/>').hide())[0];
 	// cap:大图底部的标题+索引+上/下一张(合体)
 	this.cap=$('<div>',{
 		css:{color:x.capColor},
@@ -206,21 +206,21 @@ PHZOOM.prototype={
  * @param x:插件设置项, y:当前index, Z:初始传入的对象集合, z:过滤后的对象集合
  **/
 $.phzoom=function(Z,x,z){
+	x=$.extend({
+		layOpacity:.7,
+		layDur:300,
+		animDurA:300,
+		animDurB:300,
+		navColor:'#cf0',
+		capColor:'#cf0',
+		prevText:'Prev',
+		nextText:'Next',
+		limitWidth:false,
+		returnOrigin:true
+	},x),
 	(z=Z.has('img'))[0]&&(
 		$('#ph_lay')[0]||
 		$('body').append($both),
-		x=$.extend({
-			layOpacity:.7,
-			layDur:300,
-			animDurA:300,
-			animDurB:300,
-			navColor:'#cf0',
-			capColor:'#cf0',
-			prevText:'Prev',
-			nextText:'Next',
-			limitWidth:false,
-			returnOrigin:true
-		},x),
 		z.each(function(y,t){
 			$.data(t,'phzoom',new PHZOOM($(t),x,y,z));
 		})
