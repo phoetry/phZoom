@@ -1,8 +1,8 @@
 /**
  * @name jQuery phZoom Plugin
  * @version 1.291 Final
- * @create 2011-7-10
- * @lastmodified 2012-1-5
+ * @create 2011.7.10
+ * @lastmodified 2012.1.5
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
@@ -29,22 +29,22 @@ PHZOOM=function(e,x,y,z){
 	this.lnk=e.addClass('phzoom').unbind('click').bind(this.imgFn())
 		.append(this.hov=$('<span class=ph_hover/>').hide())[0];
 	// cap:大图底部的标题+索引+上/下一张(合体)
-	this.cap=$('<div>',{
+	this.cap=$('<div/>',{
 		css:{color:x.capColor},
 		id:'ph_cap',
 		html:$([
-			$('<span>',{//标题
+			$('<span/>',{//标题
 				id:'ph_txt',
 				text:this.img[0].title||this.lnk.title||'No title'
 			})[0],
-			$('<span>',{//索引
+			$('<span/>',{//索引
 				id:'ph_idx',
 				text:y+1+' / '+this.len
 			})[0]
 		])
 	}).add(
 	// nav:上/下一张
-	this.nav=$('<div>',{
+	this.nav=$('<div/>',{
 		id:'ph_nav',
 		css:{color:x.navColor},
 		html:(y?'<span id=ph_prev>'+x.prevText+'</span>':'')
