@@ -1,21 +1,21 @@
 /**
  * @name jQuery phZoom Plugin
- * @version 1.291 Final
+ * @version 1.292 Final
  * @create 2011.7.10
- * @lastmodified 2012.1.5
+ * @lastmodified 2012.1.6
  * @description Based on jQuery 1.4+
  * @author Phoetry (http://phoetry.me)
  * @url http://phoetry.me/archives/phzoom.html
  **/
 ~function($){var
 /** 
- * @param $lay:遮罩层, $zoom:大图容器, PHZOOM:构造主函数
+ * @param LAY:遮罩层, ZOOM:大图容器, PHZOOM:构造主函数
  * @param e:当前对象, x:插件设置, y:当前index, z:对象集合
  **/
-$w=$(window),$d=$(document),
-$lay=$('<div id=ph_lay/>'),
-$zoom=$('<div id=ph_zoom/>'),
-$both=$lay.add($zoom),
+W=$(window),D=$(document),
+LAY=$('<div id=ph_lay/>'),
+ZOOM=$('<div id=ph_zoom/>'),
+BOTH=LAY.add(ZOOM),
 PHZOOM=function(e,x,y,z){
 	this.opt=x;
 	this.idx=y;
@@ -51,7 +51,7 @@ PHZOOM=function(e,x,y,z){
 			+(this.end?'<span id=ph_next>'+x.nextText+'</span>':'')
 	}));
 	// 点击页面上随便哪里都能退出(后面会排除大图区域)
-	$both.click($.proxy(this,'imgQuit'));
+	BOTH.click($.proxy(this,'imgQuit'));
 	// 尝试Fix IE6下hover可能错位的BUG
 	window.XMLHttpRequest||e.height(this.img.height());
 };
@@ -75,29 +75,27 @@ PHZOOM.prototype={
 			}
 		}
 	},
-	// 为之后动画准备一些必需品, A:小图(jQuery)
-	imgPos:function(oriW,oriH){
-		var A=this.img,L=$w.scrollLeft(),T=$w.scrollTop(),
+	// 为之后动画准备一些必需品, A:小图(jQuery), oW:大图原始宽度, oH:大图原始高度
+	imgPos:function(oW,oH){
+		var A=this.img,L=W.scrollLeft(),T=W.scrollTop(),
 			pos=[
-				oriW,oriH,A.width(),A.height(),
-				A.offset().left,A.offset().top,
-				$w.width(),$w.height()
+				W.width(),W.height(),
+				A.width(),A.height(),
+				A.offset().left,A.offset().top
 			];
 		// 限宽模式下自动调整特大图
-		this.opt.limitWidth&&pos[0]>pos[6]&&(
-			pos[1]=pos[6]*pos[1]/pos[0],
-			pos[0]=pos[6]
-		);
+		this.opt.limitWidth&&oW>pos[0]&&(oH=oH/oW*(oW=pos[0]));
 		return pos.concat(
-			(pos[6]-pos[0])/2+L,
-			(pos[7]-pos[1])/2+T,
-			(pos[6]-pos[2])/2+L,
-			(pos[7]-pos[3])/2+T
+			oW,oH,
+			(pos[0]-oW)/2+L,
+			(pos[1]-oH)/2+T,
+			(pos[0]-pos[2])/2+L,
+			(pos[1]-pos[3])/2+T
 		);
 	},
 	// 开始加载大图
 	imgLoad:function(){
-		$lay.fadeTo(this.opt.layDur,this.opt.layOpacity);
+		LAY.fadeTo(this.opt.layDur,this.opt.layOpacity);
 		var that=this,B=new Image;
 		this.hov.addClass('loading');
 		B.className='zoomed';
@@ -106,7 +104,7 @@ PHZOOM.prototype={
 			// 如果此时已经退出大图, 则停止执行
 			that.hov.hasClass('loading')&&(
 				// resize之类的事件会影响文档尺寸, 故height一下
-				$zoom.height($d.height()).append(B).show(),
+				ZOOM.height(D.height()).append(B).show(),
 				that.imgAnim(B),that.preLoad()
 			);
 		};
@@ -121,9 +119,9 @@ PHZOOM.prototype={
 				B.height||+$B.attr('height')
 			),
 			// 当前大图溢出Body宽度时:true
-			oFlow=pos[6]<pos[0],
+			oFlow=pos[0]<pos[6],
 			// 预备好动画后需要绑定的事件
-			E=this.evtMon(pos[6],pos[6]-pos[0],!oFlow,$B);
+			E=this.evtMon($B,pos[0],pos[0]-pos[6],!oFlow);
 		$B.after(this.cap.hide()).css({//定位1
 			left:pos[4],top:pos[5],
 			width:pos[2],height:pos[3]
@@ -132,16 +130,16 @@ PHZOOM.prototype={
 		},this.opt.animDurA,function(){
 			$B.animate({//定位3, 动画2
 				left:pos[8],top:pos[9],
-				width:pos[0],height:pos[1]
+				width:pos[6],height:pos[7]
 			},that.opt.animDurB,function(){//动画完
 				that.hov.removeClass('loading');
 				that.cap.css({//定位cap
-					top:pos[1]+pos[9],
+					top:pos[7]+pos[9],
 					left:oFlow?0:pos[8],
-					width:oFlow?pos[6]:pos[0]
+					width:oFlow?pos[0]:pos[6]
 				}).fadeTo(300,.7);
 				//定位nav并绑定鼠标事件
-				that.nav.bind(E).css('top',pos[1]/3+pos[9]);
+				that.nav.bind(E).css('top',pos[7]/3+pos[9]);
 				//绑定快捷键
 				that.keyBind();
 			}).bind(E);
@@ -149,9 +147,9 @@ PHZOOM.prototype={
 	},
 	// 退出大图, isQuit为undefined时化身为imgChange的过程(将保持遮罩层)
 	imgQuit:function(isQuit){
-		this.hov.hide().hasClass('loading')?this.hov.removeClass('loading'):$d.unbind('.phzoom');
-		$zoom.hide().empty();
-		isQuit&&$lay.fadeOut();
+		this.hov.hide().hasClass('loading')?this.hov.removeClass('loading'):D.unbind('.phzoom');
+		isQuit&&LAY.fadeOut();
+		ZOOM.hide().empty();
 		return false;
 	},
 	// 切换上/下一张, 不传参给imgQuit
@@ -168,20 +166,20 @@ PHZOOM.prototype={
 	// 绑定快捷键, 逃脱键:退出, 左箭头:上一张, 右箭头:下一张
 	keyBind:function(){
 		var that=this;
-		$d.bind('keydown.phzoom',function(e){
+		D.bind('keydown.phzoom',function(e){
 			e=e.which;
-			return e==27?that.imgQuit(1):
+			return e==37&&that.idx?that.imgChange(-1):
 				e==39&&that.end?that.imgChange(1):
-				e^37||!that.idx||that.imgChange(-1)
+				e^27||that.imgQuit(1)
 		});
 	},
 	// 大图加载完毕后需要绑定的事件
-	evtMon:function(a,b,c,$B){
+	evtMon:function($B,a,b,c){
 		var that=this,nav=$('span',this.nav).hide();
 		return{
 			click:function(e){
-				e=e.pageX>a/2;
 				return that.len<2||(
+					e=e.pageX>a/2,
 					that.idx?that.end
 					?that.imgChange(e||-1)
 					:e||that.imgChange(-1)
@@ -220,7 +218,7 @@ $.phzoom=function(Z,x,z){
 	},x),
 	(z=Z.has('img'))[0]&&(
 		$('#ph_lay')[0]||
-		$('body').append($both),
+		$('body').append(BOTH),
 		z.each(function(y,t){
 			$.data(t,'phzoom',new PHZOOM($(t),x,y,z));
 		})
