@@ -1,22 +1,23 @@
 # phZoom.js
 * * *
-###### phZoom是一个小巧的jQuery看图灯箱插件
+##### phZoom是一个小巧的jQuery看图灯箱插件
 * 当前版本: phZoom 1.292 Final  
-* 更新时间: 2012.1.6
+* 更新时间: 2012.1.6  
 * * *
 
 ### 使用方法
 1. 加载jQuery库(需1.4+)
 2. 加载phZoom.css, 请保证压缩包内的两张小图片与phzoom.css同级目录
 3. 加载phzoom.js, 请保证其加载于jQuery库之后
-4. 调用接口:  
+4. 调用接口:
+
 ```js
 	$node.phzoom({  
 	// 此处为设置项, 亦可留空  
 	});
 ```
-* 请把 `$node` 改为你所需的jQuery选择器, 如: `$('#content a')`
-###### 不管如何调用, 请务必将调用代码包在一个 `DOM Ready` 方法内, 如:
+请把 `$node` 改为所需的jQuery选择器, 如: `$('#content a')`  
+##### 并且, 建议将调用代码包在一个 `DOM Ready` 方法内, 如:
 ```js
 	$(function(){
 	// 此处为上面的调用接口
