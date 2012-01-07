@@ -1,6 +1,6 @@
 # phZoom.js
-### phZoom是一个小巧的jQuery看图灯箱插件 [Demo](http://phoetry.me/archives/phzoom.html)
-* 当前版本: phZoom 1.292 Final  
+### phZoom是一个小巧的jQuery看图灯箱插件 [(Demo)](http://phoetry.me/archives/phzoom.html)
+* 当前版本: 1.292 Final  
 * 更新时间: 2012.1.6
 
 ### 使用方法
