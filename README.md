@@ -1,11 +1,12 @@
 # phZoom.js
 * * *
-### phZoom是一个小巧的jQuery看图灯箱插件
+#### phZoom是一个小巧的jQuery看图灯箱插件
+* 更新时间: 2012.1.6  
 * 当前版本: phZoom 1.292 Final  
-* 更新时间: 2012.1.6
+* 查看Demo: http://phoetry.me/archives/phzoom.html
 
-### 使用方法
-1. 加载jQuery库(需1.4+)
+#### 使用方法
+1. 加载jQuery库(需**1.4+**)
 2. 加载 `phZoom.css` , 请保证压缩包内的两张小图片与 `phzoom.css` 同级目录
 3. 加载 `phzoom.js` , 请保证其加载于jQuery库之后
 4. 调用接口如下:
@@ -17,7 +18,7 @@
 ```
 请把 `$node` 改为所需的jQuery选择器, 如: `$('#content a')`
 
-### 设置选项
+#### 设置选项
 ```js
 {
 	layOpacity:0.7,      // 遮罩层不透明度应为0到1之间的某个小数, 默认0.7即为70%不透明
@@ -33,7 +34,7 @@
 }
 ```
 
-### 更新历史
+#### 更新历史
 2012.1.6 | 1.292 Final  
 1. 继续强化pos数组, 提高其效率  
 2. 调整了一些重要变量的命名  
@@ -106,7 +107,7 @@
 如果你对这个插件有兴趣, 敬请关注:  
 [作者的博客](http://phoetry.me)  
 [插件发布页](http://phoetry.me/archives/phzoom.html)  
-[GitHub页](https://github.com/phoetry/phZoom)
+[On GitHub](https://github.com/phoetry/phZoom)
 
 * * *
 
