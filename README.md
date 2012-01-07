@@ -1,5 +1,4 @@
-phZoom
-= = =
+### phZoom
 一个小巧的jQuery看图灯箱插件
 * * *
 当前版本: phZoom 1.292 Final  
